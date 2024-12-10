@@ -35,5 +35,50 @@ async def register_user(
 
 async def get_user_language(user_id: int) -> str:
     async with async_session() as session:
-        language = select(User).where(User.telegram_id == user_id)
+        language = await session.scalar(select(User).where(User.telegram_id == user_id))
         return language.language
+
+async def update_active(user_id, last_active_date):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(last_active_date=last_active_date))
+        await session.commit()
+
+async def update_role(user_id, role):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(role=role))
+        await session.commit()
+
+async def update_location_lat(user_id, location_lat):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(location_lat=location_lat))
+        await session.commit()
+
+async def update_location_lon(user_id, location_lon):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(location_lon=location_lon))
+        await session.commit()
+
+async def update_interest(user_id, interest):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(interest=interest))
+        await session.commit()
+
+async def update_cuisine(user_id, cuisine):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(cuisine=cuisine))
+        await session.commit()
+
+async def update_time_of_day(user_id, time_of_day):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(time_of_day=time_of_day))
+        await session.commit()
+
+async def update_notify_discounts(user_id, notify_discounts):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(notify_discounts=notify_discounts))
+        await session.commit()
+
+async def update_language(user_id, language):
+    async with async_session() as session:
+        await session.execute(update(User).where(User.telegram_id == user_id).values(language=language))
+        await session.commit()      

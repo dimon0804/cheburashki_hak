@@ -5,12 +5,9 @@ import os
 load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN') 
-DB_LOGIN = os.getenv('DB_LOGIN')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_IP = os.getenv('DB_IP')
-DB_NAME = os.getenv('DB_NAME')
 SQLALCHEMY_URL = os.getenv('SQLALCHEMY_URL')
 DEBUG = True
+TIME_ZONE = "Europe/Moscow"
 
 LANGDICT = {
     "ru": "Russian 🇷🇺",
