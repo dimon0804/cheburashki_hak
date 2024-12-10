@@ -4,8 +4,9 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.types import BotCommand
 import asyncio
 import logging
-from handlers import router
 
+from handlers.user_handlers import router
+from database.models import async_main
 from config import BOT_TOKEN, DEBUG
 
 
@@ -16,6 +17,7 @@ async def main():
     dp.include_routers(router)
     await bot.delete_webhook(drop_pending_updates=True)
     await set_commands(bot)
+    await async_main()
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     
 # Установка команд бота
