@@ -53,3 +53,31 @@ def notifications(language):
         [InlineKeyboardButton(text=transl.translate("Нет",  dest=language).text, callback_data="notifications_no")],
         ])
         return notifications
+
+def change(language):
+        change = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=transl.translate("Изменить данные",  dest=language).text, callback_data="change")]
+        ]
+        )
+        return change
+
+# def change_geolocation(language):
+#         change_geolocation = InlineKeyboardMarkup(inline_keyboard=[
+#         [InlineKeyboardButton(text=transl.translate("Изменить геолокацию",  dest=language).text, callback_data="change_geolocation")]
+#         [InlineKeyboardButton(text=transl.translate("Изменить место",  dest=language).text, callback_data="change_location")]
+#         [InlineKeyboardButton(text=transl.translate("Изменить интерес",  dest=language).text, callback_data="change_place")]
+#         [InlineKeyboardButton(text=transl.translate("Изменить кухню",  dest=language).text, callback_data="change_cuisine")]
+#         [InlineKeyboardButton(text=transl.translate("Изменить время",  dest=language).text, callback_data="change_time")]
+#         [InlineKeyboardButton(text=transl.translate("Изменить уведомления",  dest=language).text, callback_data="change_notifications")]
+#         ])
+#         return change_geolocation
+
+def search(language):
+        search = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=transl.translate("Найти ближайшие места",  dest=language).text, callback_data="search")]
+                ])
+        return search
+      
+
+        
+

@@ -1,5 +1,6 @@
 from sqlalchemy import select, update
-from database.models import async_session, User
+from database.models import async_session, User, Place
+# from sqlalchemy.ext.asyncio import AsyncSession
 
 async def is_user_registered(user_id: int) -> bool:
     async with async_session() as session:
@@ -82,3 +83,19 @@ async def update_language(user_id, language):
     async with async_session() as session:
         await session.execute(update(User).where(User.telegram_id == user_id).values(language=language))
         await session.commit()      
+
+async def get_user_info(user_id: int) -> str:
+    async with async_session() as session:
+        info = await session.scalar(select(User).where(User.telegram_id == user_id))
+        return info
+
+async def get_location(user_id: int) -> str:
+    async with async_session() as session:
+        location = await session.scalar(select(User).where(User.telegram_id == user_id))
+        return location
+    
+async def get_all_places(interest):
+    async with async_session() as session:
+        result = await session.scalar(select(Place).where(Place.interest == interest))
+        return result.location
+    

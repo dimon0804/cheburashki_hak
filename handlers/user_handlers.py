@@ -4,6 +4,9 @@ from aiogram.filters import Command
 from googletrans import Translator
 from datetime import datetime
 from pytz import timezone
+import requests
+import math
+from sqlalchemy.ext.asyncio import AsyncSession
 
 import text
 from keyboards.language import change_language
@@ -22,6 +25,8 @@ async def start(msg: Message):
     if user_registered:
         user_language = await requremets.get_user_language(user_id)
         await msg.reply(transl.translate(text.error_register,  dest=user_language).text)
+        await msg.answer(transl.translate(text.menu, dest=user_language).text,
+                                  reply_markup=user_kb.search(language=user_language))
         return
     await msg.answer(text.hello.format(fullname=msg.from_user.full_name), 
                      reply_markup=change_language)
@@ -32,8 +37,36 @@ async def info(msg: Message):
     user_registered = await requremets.is_user_registered(user_id)
     if user_registered:
         user_language = await requremets.get_user_language(user_id)
+        await msg.answer(transl.translate(text.menu, dest=user_language).text,
+                                  reply_markup=user_kb.search(language=user_language))
         await msg.answer(transl.translate(text.description,  dest=user_language).text)
         return
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    R = 6371  # Радиус Земли в километрах
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    a = math.sin(delta_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    return R * c
+
+@router.callback_query(F.data == "search")
+async def handle_find_closest(callback: types.CallbackQuery):
+    user_data = await requremets.get_location(callback.from_user.id)
+    user_lat = user_data.location_lat
+    user_lon = user_data.location_lon
+
+    # Получение всех мест из базы данных
+    places = await requremets.get_all_places(user_data.interest)
+    lat, lon = places.split(",")
+
+    url = f"Ваш маршрут: https://yandex.by/maps/39/rostov-na-donu/?rtext={user_lat},{user_lon}~{lat},{lon}&rtt=auto&ruri=~&z=18.26"
+    await callback.message.answer(url)
+
 
 @router.callback_query(F.data == "go_poll")
 async def go_poll_kb(callback: CallbackQuery, bot: Bot):
@@ -136,6 +169,9 @@ async def notifications_callback_handler(callback: CallbackQuery, bot: Bot):
 
     await callback.message.answer(transl.translate(text.successfully_opros, dest=user_language).text,
                                   reply_markup=types.ReplyKeyboardRemove())
+    await callback.message.answer(transl.translate(text.menu, dest=user_language).text,
+                                  reply_markup=user_kb.search(language=user_language))
+
 
 @router.callback_query(F.data.in_(config.LANGUES))
 async def language(callback: CallbackQuery, bot: Bot):
@@ -164,3 +200,23 @@ async def language(callback: CallbackQuery, bot: Bot):
     await callback.message.answer(transl.translate(text.opros_approval,  dest=lang).text, 
                                   reply_markup=user_kb.go_poll(language=lang))
     
+@router.message(F.text == "Мой профиль")
+async def my_profile(msg: Message):
+    user_id = msg.from_user.id
+    user_info = await requremets.get_user_info(user_id)
+
+    if not user_info:
+        await msg.answer("Не удалось загрузить информацию о вашем профиле.")
+        return
+
+    profile_text = (
+        f"Ваш профиль:\n"
+        f"Имя: {user_info['fullname']}\n"
+        f"Язык: {user_info['language']}\n"
+        f"Дата регистрации: {user_info['registration_date']}\n"
+        f"Интересы: {user_info['interest']}"
+        f"Кухни: {user_info['cuisine']}\n"
+        f"Время: {user_info['time_of_day']}\n"
+        f"Уведомление: {user_info['notify_discounts']}\n"
+    )
+    await msg.answer(profile_text)

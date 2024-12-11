@@ -6,8 +6,9 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN') 
 SQLALCHEMY_URL = os.getenv('SQLALCHEMY_URL')
-DEBUG = True
+DEBUG = False
 TIME_ZONE = "Europe/Moscow"
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 LANGDICT = {
     "ru": "Russian 🇷🇺",
